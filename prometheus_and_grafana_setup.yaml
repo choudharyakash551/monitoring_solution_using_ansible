@@ -1,0 +1,60 @@
+---
+- name: Deploy Prometheus and Grafana
+  hosts: localhost
+  connection: local
+  become: yes  # Allow tasks to execute with root privileges
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3  # Specify Python interpreter path
+    prometheus_version: "2.51.1"  # Specified Prometheus version
+    grafana_version: "10.0.0"  # Specified Grafana version
+
+  tasks:
+    - name: Install prerequisites
+      package:  # Install required packages
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - wget
+        - gnupg2
+
+    - name: Download Grafana tar.gz file
+      get_url:  # Download Grafana tar.gz file
+        url: "https://dl.grafana.com/oss/release/grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+        dest: "/tmp/grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+
+    - name: Extract Grafana tar.gz file
+      unarchive:  # Extract Grafana tar.gz file
+        src: "/tmp/grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+        dest: /opt/
+        remote_src: yes  # Use remote source for extraction
+
+    - name: Rename Grafana Directory
+      command: mv /opt/grafana-10.0.0 /opt/grafana  # Rename Grafana directory
+
+    - name: Start and enable Grafana service
+      systemd:  # Start and enable Grafana service
+        name: grafana
+        state: started
+        enabled: yes
+
+    - name: Download Prometheus tar.gz file
+      get_url:  # Download Prometheus tar.gz file
+        url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+        dest: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+
+    - name: Extract Prometheus tar.gz file
+      unarchive:  # Extract Prometheus tar.gz file
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+        dest: /opt
+        remote_src: yes  # Use remote source for extraction
+
+    - name: Rename Prometheus Directory
+      command: mv /opt/prometheus-2.51.1.linux-amd64 /opt/prometheus  # Rename Prometheus directory
+
+    - name: Start and enable Prometheus service
+      systemd:  # Start and enable Prometheus service
+        name: prometheus
+        state: started
+        enabled: yes
+
