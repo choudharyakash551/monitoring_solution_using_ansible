@@ -31,4 +31,4 @@ scrape_configs:
   # Scraping metrics from Flask app running on port 3000
   - job_name: "flask_app"
     static_configs:
-      - targets: ["localhost:3000"]
+      - targets: ["localhost:5000"]
