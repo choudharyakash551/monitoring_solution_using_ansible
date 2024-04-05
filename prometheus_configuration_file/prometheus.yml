@@ -13,7 +13,7 @@ alerting:
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
-  # - "first_rules.yml"
+  - "alert.rules.yml"  # Add alert rules file here
   # - "second_rules.yml"
 
 # A scrape configuration containing exactly one endpoint to scrape:
@@ -27,3 +27,8 @@ scrape_configs:
 
     static_configs:
       - targets: ["localhost:9090"]
+
+  # Scraping metrics from Flask app running on port 3000
+  - job_name: "flask_app"
+    static_configs:
+      - targets: ["localhost:3000"]
